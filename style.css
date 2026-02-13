@@ -6,3 +6,13 @@ body.authenticated .role-logged-out { display: none; }
 
 .role-admin { display: none; }
 body.is-admin .role-admin { display: block; }
+
+
+.role-admin { 
+  display: none !important; 
+}
+
+
+body.is-admin .role-admin { 
+  display: block !important; 
+}
