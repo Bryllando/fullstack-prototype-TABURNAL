@@ -408,6 +408,41 @@
     </div>
   </div>
 
+  <!-- Edit Profile Modal -->
+  <div class="modal fade" id="editProfileModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Profile</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <form id="edit-profile-form">
+            <div class="mb-3">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control" id="edit-profile-firstname" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control" id="edit-profile-lastname" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" id="edit-profile-email" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">New Password</label>
+              <input type="password" class="form-control" id="edit-profile-password" minlength="6">
+              <small class="text-muted">Leave blank to keep current password (minimum 6 characters if changing)</small>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast Container -->
   <div class="toast-container position-fixed top-0 end-0 p-3" id="toast-container"></div>
 

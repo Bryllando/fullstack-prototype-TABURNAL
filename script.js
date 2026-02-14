@@ -47,18 +47,7 @@ function seedDatabase() {
         verified: true
       }
     ],
-    departments: [
-      {
-        id: generateId(),
-        name: 'Engineering',
-        description: 'Software development team'
-      },
-      {
-        id: generateId(),
-        name: 'HR',
-        description: 'Human Resources'
-      }
-    ],
+    departments: [],
     employees: [],
     requests: []
   };
@@ -289,8 +278,91 @@ function renderProfile() {
         <p><strong>Name:</strong> ${currentUser.firstName} ${currentUser.lastName}</p>
         <p><strong>Email:</strong> ${currentUser.email}</p>
         <p><strong>Role:</strong> <span class="badge bg-${currentUser.role === 'Admin' ? 'danger' : 'primary'}">${currentUser.role}</span></p>
-        <button class="btn btn-outline-primary mt-3" onclick="alert('Edit profile functionality would go here')">Edit Profile</button>
+        <button class="btn btn-outline-primary mt-3" onclick="openEditProfileModal()">Edit Profile</button>
     `;
+}
+
+// ============================================
+// EDIT PROFILE
+// ============================================
+
+function openEditProfileModal() {
+  if (!currentUser) return;
+
+  // Populate the modal with current user data
+  document.getElementById('edit-profile-firstname').value = currentUser.firstName;
+  document.getElementById('edit-profile-lastname').value = currentUser.lastName;
+  document.getElementById('edit-profile-email').value = currentUser.email;
+  document.getElementById('edit-profile-password').value = '';
+
+  // Show the modal
+  const modal = new bootstrap.Modal(document.getElementById('editProfileModal'));
+  modal.show();
+}
+
+function handleEditProfileForm(e) {
+  e.preventDefault();
+
+  const firstName = document.getElementById('edit-profile-firstname').value.trim();
+  const lastName = document.getElementById('edit-profile-lastname').value.trim();
+  const email = document.getElementById('edit-profile-email').value.trim().toLowerCase();
+  const password = document.getElementById('edit-profile-password').value;
+
+  // Check if email is being changed and if it's already taken by another account
+  if (email !== currentUser.email) {
+    const existingAccount = window.db.accounts.find(acc => acc.email === email && acc.id !== currentUser.id);
+    if (existingAccount) {
+      showToast('Email already in use by another account', 'danger');
+      return;
+    }
+  }
+
+  // Find the current user's account in the database
+  const accountIndex = window.db.accounts.findIndex(acc => acc.id === currentUser.id);
+  if (accountIndex === -1) {
+    showToast('Account not found', 'danger');
+    return;
+  }
+
+  // Update the account
+  window.db.accounts[accountIndex].firstName = firstName;
+  window.db.accounts[accountIndex].lastName = lastName;
+  window.db.accounts[accountIndex].email = email;
+
+  // Update password if provided
+  if (password) {
+    window.db.accounts[accountIndex].password = password;
+  }
+
+  // Update auth token if email changed
+  if (email !== currentUser.email) {
+    localStorage.setItem('auth_token', email);
+  }
+
+  // Update current user object
+  currentUser.firstName = firstName;
+  currentUser.lastName = lastName;
+  currentUser.email = email;
+  if (password) {
+    currentUser.password = password;
+  }
+
+  // Save to storage
+  saveToStorage();
+
+  // Update UI
+  setAuthState(true, currentUser);
+  renderProfile();
+
+  // Show success message
+  showToast('Profile updated successfully', 'success');
+
+  // Close modal
+  const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
+  modal.hide();
+
+  // Reset form
+  e.target.reset();
 }
 
 
@@ -807,6 +879,11 @@ function resetModals() {
             </div>
         `;
   });
+
+
+  document.getElementById('editProfileModal').addEventListener('hidden.bs.modal', function () {
+    document.getElementById('edit-profile-form').reset();
+  });
 }
 
 
@@ -831,6 +908,7 @@ document.addEventListener('DOMContentLoaded', function () {
   document.getElementById('department-form').addEventListener('submit', handleDepartmentForm);
   document.getElementById('account-form').addEventListener('submit', handleAccountForm);
   document.getElementById('request-form').addEventListener('submit', handleRequestForm);
+  document.getElementById('edit-profile-form').addEventListener('submit', handleEditProfileForm);
 
 
   document.getElementById('logout-btn').addEventListener('click', function (e) {
@@ -858,3 +936,4 @@ window.editAccount = editAccount;
 window.resetPassword = resetPassword;
 window.deleteAccount = deleteAccount;
 window.removeRequestItem = removeRequestItem;
+window.openEditProfileModal = openEditProfileModal;
