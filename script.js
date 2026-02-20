@@ -193,13 +193,15 @@ function handleRegistration(e) {
   }
 
 
+  // FIX: Self-registered accounts are always 'User' role.
+  // Only an Admin can create Admin accounts via the Accounts page.
   const newAccount = {
     id: generateId(),
     firstName,
     lastName,
     email,
     password,
-    role: 'Admin',
+    role: 'User',   // ✅ FIXED: was 'Admin' — now correctly 'User'
     verified: false
   };
 
